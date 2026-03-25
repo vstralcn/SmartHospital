@@ -5,7 +5,7 @@
     <section class="hero medical-card">
       <div>
         <div class="hero-badge">智能问诊病历系统</div>
-        <h1>医疗专业风问诊工作台</h1>
+        <h1>门诊问诊工作台</h1>
         <p>围绕问诊记录、结构化整理与病历生成构建的一体化辅助界面。</p>
       </div>
       <div class="hero-meta">
