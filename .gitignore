@@ -1,0 +1,5 @@
+.claude/
+.idea/
+.ruff_cache/
+.venv/
+.env

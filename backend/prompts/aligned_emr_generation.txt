@@ -1,0 +1,23 @@
+请基于给定问诊对话，一次性同时输出“结构化病历字段”和“病历草稿”，确保两者内容完全对齐、一致，不得互相矛盾。
+
+输出要求：
+1. 必须只输出 JSON，不要输出解释文字、Markdown、代码块。
+2. JSON 结构固定如下：
+{
+  "structured": {
+    "chief_complaint": "",
+    "present_illness": "",
+    "past_history": "",
+    "surgical_history": "",
+    "allergy_history": "",
+    "medication_history": "",
+    "family_history": "",
+    "missing_info": [],
+    "needs_confirmation": []
+  },
+  "emr_text": ""
+}
+3. structured 中所有字段应基于问诊内容提取，缺失项放入 missing_info，需要医生确认但尚不确定的信息放入 needs_confirmation。
+4. emr_text 必须与 structured 字段严格一致，不允许出现 structured 中没有的信息，也不允许遗漏 structured 中已明确的信息。
+5. 如果信息不足，仍然生成尽可能完整、但谨慎的 structured 和 emr_text，不要编造。
+6. 病历草稿语言要求正式、简洁、适合临床记录。

@@ -1,0 +1,32 @@
+[
+  {
+    "speaker": "unknown",
+    "start": 0.0,
+    "end": 2.8,
+    "text": "医生，我这两天胸口有点闷。"
+  },
+  {
+    "speaker": "unknown",
+    "start": 2.9,
+    "end": 4.5,
+    "text": "持续多久了？有没有胸痛或者气短？"
+  },
+  {
+    "speaker": "unknown",
+    "start": 4.6,
+    "end": 8.9,
+    "text": "大概两天，没有明显胸痛，走路快一点会有点气短。"
+  },
+  {
+    "speaker": "unknown",
+    "start": 9.0,
+    "end": 11.6,
+    "text": "既往有没有高血压、糖尿病或者药物过敏？"
+  },
+  {
+    "speaker": "unknown",
+    "start": 11.7,
+    "end": 14.6,
+    "text": "都没有，也没有做过手术。"
+  }
+]

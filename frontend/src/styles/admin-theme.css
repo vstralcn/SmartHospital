@@ -1,0 +1,52 @@
+:root {
+  --medical-primary: #1f6fb2;
+  --medical-primary-light: #e9f3fb;
+  --medical-accent: #18a999;
+  --medical-bg: #f3f7fb;
+  --medical-card: #ffffff;
+  --medical-border: #dbe7f3;
+  --medical-text: #213547;
+  --medical-muted: #6b7a90;
+  --medical-shadow: 0 10px 30px rgba(31, 111, 178, 0.08);
+  --medical-radius: 16px;
+}
+
+html, body, #app {
+  height: 100%;
+  margin: 0;
+  background: linear-gradient(180deg, #f7fbff 0%, var(--medical-bg) 100%);
+  color: var(--medical-text);
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+.medical-page {
+  min-height: 100%;
+}
+
+.medical-card {
+  background: var(--medical-card);
+  border: 1px solid var(--medical-border);
+  border-radius: var(--medical-radius);
+  box-shadow: var(--medical-shadow);
+}
+
+.medical-section-title {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--medical-text);
+}
+
+.el-button--primary {
+  --el-button-bg-color: var(--medical-primary);
+  --el-button-border-color: var(--medical-primary);
+  --el-button-hover-bg-color: #2b82cb;
+  --el-button-hover-border-color: #2b82cb;
+}
+
+.el-menu {
+  border-right: none;
+}

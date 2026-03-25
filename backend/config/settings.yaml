@@ -1,0 +1,24 @@
+app:
+  name: Medical EMR Demo
+  output_dir: data/output
+  disclaimer: 本系统输出结果仅用于辅助整理问诊记录，最终内容需由医生审核确认。
+audio:
+  sample_rate: 16000
+  channels: 1
+  temp_record_file: data/temp/mock_recording.wav
+asr:
+  engine: vosk
+  vosk:
+    model_name: vosk-model-small-cn-0.22
+    model_path: models/vosk-model-small-cn-0.22
+    sample_rate: 16000
+llm:
+  provider: mock
+  model: gpt-4o-mini
+  temperature: 1.0
+  base_url: ''
+  api_key: ''
+generation:
+  refresh_interval_seconds: 5
+export:
+  default_format: docx
