@@ -48,8 +48,9 @@ defineEmits(['start', 'complete', 'save', 'export-docx', 'open-settings', 'go-hi
   align-items: center;
   justify-content: space-between;
   gap: 16px;
-  margin: 0 16px 16px;
-  padding: 16px 20px;
+  margin: 0 16px 8px;
+  padding: 10px 20px;
+  flex-shrink: 0;
 }
 
 .left-section,

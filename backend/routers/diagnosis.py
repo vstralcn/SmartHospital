@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import asyncio
 import uuid
 from typing import Any, Dict, List, Optional
 
@@ -106,7 +107,9 @@ async def complete_diagnosis(body: CompleteRequest, request: Request):
             "dialogues": [],
         }
 
-    result = emr_svc.build_full_result(dialogues)
+    # Run blocking LLM call in thread pool to avoid blocking the event loop
+    # (which would stall WebSocket audio forwarding)
+    result = await asyncio.to_thread(emr_svc.build_full_result, dialogues)
     session["structured"] = result.structured.model_dump()
     session["emr_text"] = result.emr_text
     session["risk_alerts"] = result.risk_alerts
@@ -130,7 +133,8 @@ async def generate_emr(body: GenerateEMRRequest, request: Request):
     if not dialogues:
         return {"error": "没有对话记录，请先开始诊断"}
 
-    result = emr_svc.build_full_result(dialogues)
+    # Run blocking LLM call in thread pool to avoid blocking the event loop
+    result = await asyncio.to_thread(emr_svc.build_full_result, dialogues)
     session["structured"] = result.structured.model_dump()
     session["emr_text"] = result.emr_text
     session["risk_alerts"] = result.risk_alerts
@@ -154,5 +158,5 @@ async def follow_up(session_id: str, request: Request):
 
     from models.emr import StructuredEMR
     structured = StructuredEMR.model_validate(structured_data)
-    suggestions = emr_svc.build_follow_up_questions(structured)
+    suggestions = await asyncio.to_thread(emr_svc.build_follow_up_questions, structured)
     return FollowUpResponse(suggestions=suggestions)

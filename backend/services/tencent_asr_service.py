@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import base64
 import hashlib
+import hmac
 import time
 import uuid
 from urllib.parse import quote, urlencode
@@ -12,7 +13,7 @@ from loguru import logger
 class TencentAsrService:
     """Generate signed WebSocket URL for Tencent Cloud real-time ASR."""
 
-    HOST: str = "asr.cloud.tencent.com.cn"
+    HOST: str = "asr.cloud.tencent.com"
     PATH: str = "/asr/v2/"
 
     def generate_sign_url(
@@ -57,8 +58,7 @@ class TencentAsrService:
             f"Tencent ASR sign original: {self.HOST}{self.PATH}{appid}?engine_model_type={engine_model_type}&...&secretid={secret_id[:6]}***"
         )
 
-        sign_payload = (sign_original + secret_key).encode("utf-8")
-        sign_bytes = hashlib.sha1(sign_payload).digest()
+        sign_bytes = hmac.new(secret_key.encode("utf-8"), sign_original.encode("utf-8"), hashlib.sha1).digest()
         signature = base64.b64encode(sign_bytes).decode("utf-8")
 
         encoded_signature = quote(signature, safe="")

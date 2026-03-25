@@ -2,7 +2,78 @@ from __future__ import annotations
 
 from typing import Any, cast
 
+from loguru import logger
+
 from .base_provider import BaseLLMProvider
+
+
+# ---------- JSON-Schema response formats ----------
+
+_STRUCTURED_EMR_FIELDS = {
+    "chief_complaint": {"type": "string"},
+    "present_illness": {"type": "string"},
+    "past_history": {"type": "string"},
+    "surgical_history": {"type": "string"},
+    "allergy_history": {"type": "string"},
+    "medication_history": {"type": "string"},
+    "family_history": {"type": "string"},
+    "missing_info": {"type": "array", "items": {"type": "string"}},
+    "needs_confirmation": {"type": "array", "items": {"type": "string"}},
+}
+
+_STRUCTURED_EMR_REQUIRED = [
+    "chief_complaint",
+    "present_illness",
+    "past_history",
+    "surgical_history",
+    "allergy_history",
+    "medication_history",
+    "family_history",
+    "missing_info",
+    "needs_confirmation",
+]
+
+_FORMAT_STRUCTURED_EXTRACT: dict = {
+    "type": "json_schema",
+    "json_schema": {
+        "name": "structured_emr",
+        "strict": True,
+        "schema": {
+            "type": "object",
+            "properties": _STRUCTURED_EMR_FIELDS,
+            "required": _STRUCTURED_EMR_REQUIRED,
+            "additionalProperties": False,
+        },
+    },
+}
+
+_FORMAT_ALIGNED_EMR: dict = {
+    "type": "json_schema",
+    "json_schema": {
+        "name": "aligned_emr",
+        "strict": True,
+        "schema": {
+            "type": "object",
+            "properties": {
+                "structured": {
+                    "type": "object",
+                    "properties": _STRUCTURED_EMR_FIELDS,
+                    "required": _STRUCTURED_EMR_REQUIRED,
+                    "additionalProperties": False,
+                },
+                "emr_text": {"type": "string"},
+            },
+            "required": ["structured", "emr_text"],
+            "additionalProperties": False,
+        },
+    },
+}
+
+# Map prompt_type (first line of system_prompt) → response_format
+_RESPONSE_FORMAT_MAP: dict[str, dict] = {
+    "structured_extract": _FORMAT_STRUCTURED_EXTRACT,
+    "aligned_emr_generation": _FORMAT_ALIGNED_EMR,
+}
 
 
 class OpenAIProvider(BaseLLMProvider):
@@ -45,79 +116,26 @@ class OpenAIProvider(BaseLLMProvider):
             ],
         )
 
-        structured_response_format = cast(
-            Any,
-            {
-                "type": "json_schema",
-                "json_schema": {
-                    "name": "structured_emr",
-                    "strict": True,
-                    "schema": {
-                        "type": "object",
-                        "properties": {
-                            "chief_complaint": {"type": "string"},
-                            "present_illness": {"type": "string"},
-                            "past_history": {"type": "string"},
-                            "surgical_history": {"type": "string"},
-                            "allergy_history": {"type": "string"},
-                            "medication_history": {"type": "string"},
-                            "family_history": {"type": "string"},
-                            "missing_info": {"type": "array", "items": {"type": "string"}},
-                            "needs_confirmation": {"type": "array", "items": {"type": "string"}},
-                        },
-                        "required": [
-                            "chief_complaint",
-                            "present_illness",
-                            "past_history",
-                            "surgical_history",
-                            "allergy_history",
-                            "medication_history",
-                            "family_history",
-                            "missing_info",
-                            "needs_confirmation",
-                        ],
-                        "additionalProperties": False,
-                    },
-                },
-            },
-        )
+        kwargs: dict[str, Any] = {
+            "model": self.model,
+            "messages": messages,
+            "timeout": 300,
+        }
+        if self.temperature is not None:
+            kwargs["temperature"] = self.temperature
 
-        if prompt_type == "structured_extract":
+        response_format = _RESPONSE_FORMAT_MAP.get(prompt_type)
+        if response_format is not None:
             try:
-                if self.temperature is None:
-                    response = client.chat.completions.create(
-                        model=self.model,
-                        messages=messages,
-                        response_format=structured_response_format,
-                        timeout=300
-                    )
-                else:
-                    response = client.chat.completions.create(
-                        model=self.model,
-                        messages=messages,
-                        temperature=self.temperature,
-                        response_format=structured_response_format,
-                        timeout=300
-                    )
+                kwargs["response_format"] = response_format
+                response = client.chat.completions.create(**kwargs)
             except Exception:
-                if self.temperature is None:
-                    response = client.chat.completions.create(model=self.model, messages=messages, timeout=300)
-                else:
-                    response = client.chat.completions.create(
-                        model=self.model,
-                        messages=messages,
-                        temperature=self.temperature,
-                        timeout=300
-                    )
-        elif self.temperature is None:
-            response = client.chat.completions.create(model=self.model, messages=messages, timeout=300)
+                # Fallback: some providers don't support response_format
+                logger.warning(f"response_format not supported for {prompt_type}, falling back")
+                kwargs.pop("response_format", None)
+                response = client.chat.completions.create(**kwargs)
         else:
-            response = client.chat.completions.create(
-                model=self.model,
-                messages=messages,
-                temperature=self.temperature,
-                timeout=300
-            )
+            response = client.chat.completions.create(**kwargs)
 
         if not response.choices:
             return ""
@@ -133,7 +151,7 @@ class OpenAIProvider(BaseLLMProvider):
                 model=self.model,
                 messages=[{"role": "user", "content": "ping"}],
                 max_tokens=5,
-                timeout=10
+                timeout=10,
             )
             if not response.choices:
                 return False, "模型返回为空"

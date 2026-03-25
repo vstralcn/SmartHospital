@@ -12,6 +12,10 @@ class MockProvider(BaseLLMProvider):
         prompt_type = (system_prompt or "").splitlines()[0].strip()
         if prompt_type == "structured_extract":
             return json.dumps(self._build_structured(payload.get("dialogues", [])), ensure_ascii=False, indent=2)
+        if prompt_type == "aligned_emr_generation":
+            structured = self._build_structured(payload.get("dialogues", []))
+            emr_text = self._build_emr_text(structured)
+            return json.dumps({"structured": structured, "emr_text": emr_text}, ensure_ascii=False, indent=2)
         if prompt_type == "emr_generation":
             return self._build_emr_text(payload.get("structured", {}))
         if prompt_type == "risk_check":

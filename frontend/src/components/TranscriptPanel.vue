@@ -9,7 +9,7 @@
     </div>
 
     <div class="transcript-list">
-      <el-table :data="dialogues" style="width: 100%" size="small" max-height="420">
+      <el-table :data="dialogues" style="width: 100%" size="small">
         <el-table-column prop="start" label="时间" width="78">
           <template #default="{ row }">{{ formatTime(row.start) }}</template>
         </el-table-column>

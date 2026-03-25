@@ -287,65 +287,77 @@ function handleLogout() {
 .diagnosis-page {
   display: flex;
   flex-direction: column;
-  min-height: 100vh;
+  height: 100vh;
+  overflow: hidden;
   width: 100%;
 }
 
 .hero {
-  margin: 16px;
-  padding: clamp(18px, 2.4vw, 28px);
-  display: grid;
-  grid-template-columns: minmax(0, 1.5fr) minmax(280px, 1fr);
-  align-items: start;
-  gap: 20px;
+  margin: 8px 16px;
+  padding: 10px 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
   background: linear-gradient(135deg, #fafdff 0%, #eef6ff 100%);
+  flex-shrink: 0;
+}
+
+.hero > div:first-child {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
 }
 
 .hero-badge {
   display: inline-block;
-  padding: 6px 12px;
+  padding: 4px 10px;
   border-radius: 999px;
   background: var(--medical-primary-light);
   color: var(--medical-primary);
   font-size: 12px;
   font-weight: 700;
+  white-space: nowrap;
+  flex-shrink: 0;
 }
 
 .hero h1 {
-  margin: 14px 0 8px;
-  font-size: clamp(24px, 2.2vw, 30px);
+  margin: 0;
+  font-size: 18px;
+  font-weight: 700;
+  white-space: nowrap;
 }
 
 .hero p {
-  margin: 0;
-  color: var(--medical-muted);
+  display: none;
 }
 
 .hero-meta {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-  gap: 14px;
-  width: 100%;
+  display: flex;
+  gap: 8px;
+  flex-shrink: 0;
 }
 
 .meta-item {
   min-width: 0;
-  padding: 16px 18px;
-  border-radius: 14px;
+  padding: 6px 12px;
+  border-radius: 10px;
   background: #fff;
   border: 1px solid var(--medical-border);
+  display: flex;
+  align-items: center;
+  gap: 6px;
 }
 
 .meta-item span {
-  display: block;
   color: var(--medical-muted);
   font-size: 12px;
+  white-space: nowrap;
 }
 
 .meta-item strong {
-  display: block;
-  margin-top: 8px;
-  font-size: 16px;
+  font-size: 13px;
   word-break: break-word;
 }
 
@@ -354,13 +366,15 @@ function handleLogout() {
   grid-template-columns: minmax(280px, 1.05fr) minmax(280px, 0.95fr) minmax(320px, 1fr);
   flex: 1;
   gap: 16px;
-  padding: 0 16px 16px;
+  padding: 0 16px 8px;
   min-height: 0;
+  overflow: hidden;
 }
 
 .panel {
   overflow: auto;
   min-height: 0;
+  height: 100%;
 }
 
 @media (max-width: 1440px) {
@@ -374,12 +388,9 @@ function handleLogout() {
 }
 
 @media (max-width: 1200px) {
-  .hero {
-    grid-template-columns: 1fr;
-  }
-
   .main-content {
     grid-template-columns: 1fr;
+    overflow: auto;
   }
 
   .right-panel {
@@ -388,19 +399,14 @@ function handleLogout() {
 }
 
 @media (max-width: 768px) {
-  .hero,
+  .hero {
+    margin: 6px 12px;
+    flex-wrap: wrap;
+  }
+
   .main-content {
-    margin: 0;
     padding-left: 12px;
     padding-right: 12px;
-  }
-
-  .hero {
-    margin: 12px;
-  }
-
-  .main-content {
-    padding-bottom: 12px;
   }
 }
 </style>

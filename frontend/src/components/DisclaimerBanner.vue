@@ -11,6 +11,7 @@
 
 <style scoped>
 .disclaimer-banner {
-  padding: 16px 16px 0;
+  padding: 8px 16px 0;
+  flex-shrink: 0;
 }
 </style>

@@ -7,22 +7,25 @@
       </div>
     </div>
 
-    <div v-if="!structured" class="empty-hint">完成诊断后将在此显示结构化信息</div>
-
-    <div v-else class="fields-list">
+    <div class="fields-list">
       <div v-for="field in fields" :key="field.key" class="field-card">
         <div class="field-label">{{ field.label }}</div>
-        <div class="field-value" :contenteditable="true" @blur="onFieldEdit(field.key, $event)">{{ getFieldValue(field.key) || '待补充' }}</div>
+        <div
+          class="field-value"
+          :class="{ placeholder: !getFieldValue(field.key) }"
+          :contenteditable="!!structured"
+          @blur="onFieldEdit(field.key, $event)"
+        >{{ getFieldValue(field.key) || '待补充' }}</div>
       </div>
 
-      <div v-if="structured.missing_info && structured.missing_info.length > 0" class="field-card warning-card">
+      <div v-if="structured && structured.missing_info && structured.missing_info.length > 0" class="field-card warning-card">
         <div class="field-label">缺失信息</div>
         <div class="field-value">
           <el-tag v-for="(item, i) in structured.missing_info" :key="i" type="warning" size="small" class="tag-item">{{ item }}</el-tag>
         </div>
       </div>
 
-      <div v-if="structured.needs_confirmation && structured.needs_confirmation.length > 0" class="field-card confirm-card">
+      <div v-if="structured && structured.needs_confirmation && structured.needs_confirmation.length > 0" class="field-card confirm-card">
         <div class="field-label">待确认项</div>
         <div class="field-value">
           <el-tag v-for="(item, i) in structured.needs_confirmation" :key="i" type="info" size="small" class="tag-item">{{ item }}</el-tag>
@@ -84,12 +87,6 @@ function onFieldEdit(key, event) {
   font-size: 13px;
 }
 
-.empty-hint {
-  text-align: center;
-  color: var(--medical-muted);
-  padding: 40px 16px;
-}
-
 .fields-list {
   flex: 1;
   overflow: auto;
@@ -125,6 +122,11 @@ function onFieldEdit(key, event) {
   line-height: 1.7;
   min-height: 24px;
   outline: none;
+}
+
+.field-value.placeholder {
+  color: var(--medical-muted);
+  font-style: italic;
 }
 
 .tag-item {

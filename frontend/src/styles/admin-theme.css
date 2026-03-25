@@ -24,7 +24,8 @@ html, body, #app {
 }
 
 .medical-page {
-  min-height: 100%;
+  height: 100%;
+  overflow: hidden;
 }
 
 .medical-card {
