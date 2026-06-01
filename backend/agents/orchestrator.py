@@ -32,6 +32,11 @@ class Orchestrator:
     see the message envelope (A2A protocol) — there is no shared mutable state
     between them. Every agent run is logged through ``log_sink`` so the
     execution can be observed in real time.
+
+    The orchestrator itself holds only immutable configuration. Fresh agent
+    instances are created for every :meth:`run` call so that overlapping
+    pipeline runs (the frontend polls ``generate-emr`` periodically) never
+    share the agents' per-run accumulators.
     """
 
     def __init__(
@@ -43,8 +48,10 @@ class Orchestrator:
         self.provider = provider
         self.mcp = mcp_registry
         self.log_sink = log_sink
-        self.agents = [
-            agent_cls(provider=provider, mcp_registry=mcp_registry, log_sink=log_sink)
+
+    def _build_agents(self) -> List[Any]:
+        return [
+            agent_cls(provider=self.provider, mcp_registry=self.mcp, log_sink=self.log_sink)
             for agent_cls in _AGENT_PIPELINE
         ]
 
@@ -55,10 +62,11 @@ class Orchestrator:
         task_id: Optional[str] = None,
     ) -> Dict[str, Any]:
         task_id = task_id or new_task_id()
+        agents = self._build_agents()
         message = AgentMessage(
             task_id=task_id,
             source="orchestrator",
-            target=self.agents[0].name,
+            target=agents[0].name,
             message_type="task",
             payload={
                 "session_id": session_id,
@@ -66,10 +74,10 @@ class Orchestrator:
             },
         )
 
-        for index, agent in enumerate(self.agents):
+        for index, agent in enumerate(agents):
             next_target = (
-                self.agents[index + 1].name
-                if index + 1 < len(self.agents)
+                agents[index + 1].name
+                if index + 1 < len(agents)
                 else "orchestrator"
             )
             message = agent.run(message, target=next_target)
