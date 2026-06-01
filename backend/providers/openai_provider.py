@@ -6,7 +6,6 @@ from loguru import logger
 
 from .base_provider import BaseLLMProvider
 
-
 # ---------- JSON-Schema response formats ----------
 
 _STRUCTURED_EMR_FIELDS = {

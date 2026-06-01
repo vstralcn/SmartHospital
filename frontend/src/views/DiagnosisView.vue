@@ -54,6 +54,7 @@
       @export-docx="handleExportDocx"
       @open-settings="showSettings = true"
       @go-history="goHistory"
+      @go-monitor="goMonitor"
       @logout="handleLogout"
     />
 
@@ -273,6 +274,10 @@ async function handleExportDocx() {
 
 function goHistory() {
   router.push('/consultations')
+}
+
+function goMonitor() {
+  router.push(sessionId.value ? { path: '/agent-monitor', query: { session: sessionId.value } } : '/agent-monitor')
 }
 
 function handleLogout() {

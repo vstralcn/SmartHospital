@@ -1,0 +1,82 @@
+[
+  {
+    "name": "阿司匹林",
+    "aliases": ["乙酰水杨酸", "aspirin"],
+    "category": "抗血小板药",
+    "indications": ["急性冠脉综合征", "缺血性心脏病", "脑卒中二级预防"],
+    "usage": "75-100mg 口服 每日一次",
+    "contraindications": ["活动性消化道出血", "阿司匹林过敏", "严重肝肾功能不全"],
+    "interactions": ["华法林", "布洛芬"],
+    "pregnancy_risk": "C/D（妊娠晚期禁用）"
+  },
+  {
+    "name": "硝酸甘油",
+    "aliases": ["nitroglycerin"],
+    "category": "硝酸酯类",
+    "indications": ["心绞痛", "急性心力衰竭"],
+    "usage": "0.5mg 舌下含服 必要时",
+    "contraindications": ["收缩压低于90mmHg", "使用磷酸二酯酶抑制剂（如西地那非）", "肥厚型梗阻性心肌病"],
+    "interactions": ["西地那非", "他达拉非"],
+    "pregnancy_risk": "C"
+  },
+  {
+    "name": "美托洛尔",
+    "aliases": ["metoprolol", "倍他乐克"],
+    "category": "β受体阻滞剂",
+    "indications": ["高血压", "心绞痛", "心律失常", "慢性心力衰竭"],
+    "usage": "25-50mg 口服 每日两次",
+    "contraindications": ["重度心动过缓", "二度及以上房室传导阻滞", "失代偿性心力衰竭", "支气管哮喘急性发作"],
+    "interactions": ["维拉帕米", "地尔硫卓"],
+    "pregnancy_risk": "C"
+  },
+  {
+    "name": "阿托伐他汀",
+    "aliases": ["atorvastatin", "立普妥"],
+    "category": "他汀类调脂药",
+    "indications": ["高脂血症", "动脉粥样硬化性心血管疾病一级及二级预防"],
+    "usage": "10-20mg 口服 每晚一次",
+    "contraindications": ["活动性肝病", "妊娠期及哺乳期", "不明原因转氨酶持续升高"],
+    "interactions": ["克拉霉素", "环孢素"],
+    "pregnancy_risk": "X"
+  },
+  {
+    "name": "氯吡格雷",
+    "aliases": ["clopidogrel", "波立维"],
+    "category": "抗血小板药",
+    "indications": ["急性冠脉综合征", "经皮冠状动脉介入治疗后", "缺血性脑卒中"],
+    "usage": "75mg 口服 每日一次",
+    "contraindications": ["活动性病理性出血", "重度肝功能损害"],
+    "interactions": ["奥美拉唑", "华法林"],
+    "pregnancy_risk": "B"
+  },
+  {
+    "name": "二甲双胍",
+    "aliases": ["metformin", "格华止"],
+    "category": "双胍类降糖药",
+    "indications": ["2型糖尿病", "糖尿病合并超重/肥胖"],
+    "usage": "0.5g 口服 每日两到三次",
+    "contraindications": ["重度肾功能不全(eGFR<30)", "急性代谢性酸中毒", "严重感染或缺氧状态"],
+    "interactions": ["碘造影剂", "西咪替丁"],
+    "pregnancy_risk": "B"
+  },
+  {
+    "name": "氨氯地平",
+    "aliases": ["amlodipine", "络活喜"],
+    "category": "钙通道阻滞剂",
+    "indications": ["高血压", "稳定型心绞痛", "变异型心绞痛"],
+    "usage": "5mg 口服 每日一次",
+    "contraindications": ["对二氢吡啶类过敏", "重度主动脉瓣狭窄"],
+    "interactions": ["辛伐他汀", "西柚汁"],
+    "pregnancy_risk": "C"
+  },
+  {
+    "name": "布洛芬",
+    "aliases": ["ibuprofen", "芬必得"],
+    "category": "非甾体抗炎药",
+    "indications": ["发热", "轻中度疼痛", "骨关节炎"],
+    "usage": "0.2-0.4g 口服 每6-8小时一次",
+    "contraindications": ["活动性消化道溃疡", "重度心力衰竭", "冠脉搭桥围手术期"],
+    "interactions": ["阿司匹林", "华法林", "ACEI类降压药"],
+    "pregnancy_risk": "C/D（妊娠晚期禁用）"
+  }
+]

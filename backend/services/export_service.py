@@ -1,12 +1,11 @@
 from __future__ import annotations
 
 import re
-from html.parser import HTMLParser
 from datetime import datetime
+from html.parser import HTMLParser
 from pathlib import Path
 
 from utils.file_utils import ensure_directory
-
 
 _NOISE_LINES = {
     "p, li { white-space: pre-wrap; }",

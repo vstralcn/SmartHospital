@@ -16,6 +16,7 @@
     </div>
 
     <div class="right-section">
+      <el-button text @click="$emit('go-monitor')">智能体监控</el-button>
       <el-button text @click="$emit('go-history')">问诊记录</el-button>
       <el-divider direction="vertical" v-if="doctorUser" />
       <el-dropdown v-if="doctorUser">
@@ -39,7 +40,7 @@ defineProps({
   doctorUser: { type: Object, default: null },
 })
 
-defineEmits(['start', 'complete', 'save', 'export-docx', 'open-settings', 'go-history', 'logout'])
+defineEmits(['start', 'complete', 'save', 'export-docx', 'open-settings', 'go-history', 'go-monitor', 'logout'])
 </script>
 
 <style scoped>

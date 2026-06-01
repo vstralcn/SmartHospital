@@ -3,3 +3,5 @@
 .ruff_cache/
 .venv/
 .env
+__pycache__/
+backend/mcp/data/mcp.db

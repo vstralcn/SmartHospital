@@ -1,0 +1,56 @@
+[
+  {
+    "name": "冠状动脉粥样硬化性心脏病",
+    "aliases": ["冠心病", "缺血性心脏病", "coronary heart disease"],
+    "icd10": "I25.1",
+    "typical_symptoms": ["胸闷", "胸痛", "活动后气短", "心前区压榨感", "放射至左臂或肩背"],
+    "risk_factors": ["高血压", "高血脂", "糖尿病", "吸烟", "家族史", "高龄"],
+    "recommended_labs": ["心电图", "心肌酶谱", "肌钙蛋白", "冠脉CTA"],
+    "recommended_drugs": ["阿司匹林", "阿托伐他汀", "美托洛尔", "硝酸甘油"]
+  },
+  {
+    "name": "急性心肌梗死",
+    "aliases": ["心梗", "AMI", "acute myocardial infarction"],
+    "icd10": "I21",
+    "typical_symptoms": ["持续性胸痛超过20分钟", "大汗", "濒死感", "恶心呕吐", "含服硝酸甘油不缓解"],
+    "risk_factors": ["冠心病史", "高血压", "糖尿病", "吸烟", "高脂血症"],
+    "recommended_labs": ["心电图", "肌钙蛋白", "心肌酶谱", "床旁心脏超声"],
+    "recommended_drugs": ["阿司匹林", "氯吡格雷", "美托洛尔", "阿托伐他汀"]
+  },
+  {
+    "name": "原发性高血压",
+    "aliases": ["高血压", "hypertension"],
+    "icd10": "I10",
+    "typical_symptoms": ["头晕", "头痛", "颈项僵硬", "多数无明显症状"],
+    "risk_factors": ["高盐饮食", "肥胖", "家族史", "长期精神紧张", "饮酒"],
+    "recommended_labs": ["动态血压监测", "肾功能", "尿常规", "眼底检查"],
+    "recommended_drugs": ["氨氯地平", "美托洛尔"]
+  },
+  {
+    "name": "2型糖尿病",
+    "aliases": ["糖尿病", "T2DM", "type 2 diabetes"],
+    "icd10": "E11",
+    "typical_symptoms": ["多饮", "多尿", "多食", "体重下降", "乏力"],
+    "risk_factors": ["肥胖", "家族史", "缺乏运动", "高龄", "妊娠糖尿病史"],
+    "recommended_labs": ["空腹血糖", "糖化血红蛋白", "口服葡萄糖耐量试验", "尿微量白蛋白"],
+    "recommended_drugs": ["二甲双胍"]
+  },
+  {
+    "name": "心绞痛",
+    "aliases": ["稳定型心绞痛", "angina pectoris"],
+    "icd10": "I20",
+    "typical_symptoms": ["劳力性胸痛", "胸闷", "休息或含服硝酸甘油后缓解", "持续3-5分钟"],
+    "risk_factors": ["冠心病", "高血压", "高血脂", "吸烟"],
+    "recommended_labs": ["心电图", "运动负荷试验", "冠脉CTA"],
+    "recommended_drugs": ["硝酸甘油", "美托洛尔", "阿司匹林", "氨氯地平"]
+  },
+  {
+    "name": "胃食管反流病",
+    "aliases": ["反流性食管炎", "GERD"],
+    "icd10": "K21",
+    "typical_symptoms": ["烧心", "反酸", "胸骨后烧灼感", "餐后或平卧加重"],
+    "risk_factors": ["肥胖", "高脂饮食", "吸烟", "饮酒"],
+    "recommended_labs": ["胃镜", "24小时食管pH监测"],
+    "recommended_drugs": []
+  }
+]

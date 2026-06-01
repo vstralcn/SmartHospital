@@ -3,7 +3,7 @@ from __future__ import annotations
 import asyncio
 from typing import Any
 
-from fastapi import APIRouter, Depends, HTTPException, Request, status
+from fastapi import APIRouter, Depends, HTTPException, status
 from pydantic import BaseModel, Field
 from sqlalchemy import select
 from sqlalchemy.orm import Session
@@ -39,9 +39,6 @@ class AsrConfigUpdate(BaseModel):
 
 
 def _serialize(config: AsrConfig) -> dict[str, Any]:
-    masked_key = ""
-    if config.secret_key:
-        masked_key = f"{config.secret_key[:4]}***{config.secret_key[-4:]}" if len(config.secret_key) > 8 else "***"
     masked_id = ""
     if config.secret_id:
         masked_id = f"{config.secret_id[:6]}***{config.secret_id[-4:]}" if len(config.secret_id) > 10 else config.secret_id

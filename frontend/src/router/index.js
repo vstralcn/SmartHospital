@@ -2,6 +2,7 @@ import { createRouter, createWebHistory } from 'vue-router'
 import DoctorLoginView from '../views/DoctorLoginView.vue'
 import DiagnosisView from '../views/DiagnosisView.vue'
 import ConsultationHistoryView from '../views/ConsultationHistoryView.vue'
+import AgentMonitorView from '../views/AgentMonitorView.vue'
 import AdminLayout from '../layouts/AdminLayout.vue'
 import AdminLoginView from '../views/admin/AdminLoginView.vue'
 import AdminDashboardView from '../views/admin/AdminDashboardView.vue'
@@ -28,6 +29,12 @@ const routes = [
     path: '/consultations',
     name: 'consultations',
     component: ConsultationHistoryView,
+    meta: { requiresDoctorAuth: true },
+  },
+  {
+    path: '/agent-monitor',
+    name: 'agent-monitor',
+    component: AgentMonitorView,
     meta: { requiresDoctorAuth: true },
   },
   { path: '/admin/login', name: 'admin-login', component: AdminLoginView },

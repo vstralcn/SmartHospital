@@ -94,7 +94,7 @@ async def transcribe(body: TranscribeRequest, request: Request):
 @router.post("/complete")
 async def complete_diagnosis(body: CompleteRequest, request: Request):
     session = _get_session(request, body.session_id)
-    emr_svc: Any = request.app.state.emr_service
+    orchestrator: Any = request.app.state.orchestrator
 
     dialogues = session["dialogues"]
     if not dialogues:
@@ -107,9 +107,11 @@ async def complete_diagnosis(body: CompleteRequest, request: Request):
             "dialogues": [],
         }
 
-    # Run blocking LLM call in thread pool to avoid blocking the event loop
-    # (which would stall WebSocket audio forwarding)
-    result = await asyncio.to_thread(emr_svc.build_full_result, dialogues)
+    # Run the multi-agent pipeline in a thread pool to avoid blocking the event
+    # loop (which would stall WebSocket audio forwarding).
+    result = await asyncio.to_thread(
+        orchestrator.build_full_result, dialogues, body.session_id
+    )
     session["structured"] = result.structured.model_dump()
     session["emr_text"] = result.emr_text
     session["risk_alerts"] = result.risk_alerts
@@ -127,14 +129,16 @@ async def complete_diagnosis(body: CompleteRequest, request: Request):
 @router.post("/generate-emr")
 async def generate_emr(body: GenerateEMRRequest, request: Request):
     session = _get_session(request, body.session_id)
-    emr_svc: Any = request.app.state.emr_service
+    orchestrator: Any = request.app.state.orchestrator
 
     dialogues = session["dialogues"]
     if not dialogues:
         return {"error": "没有对话记录，请先开始诊断"}
 
-    # Run blocking LLM call in thread pool to avoid blocking the event loop
-    result = await asyncio.to_thread(emr_svc.build_full_result, dialogues)
+    # Run the multi-agent pipeline in a thread pool to avoid blocking the event loop
+    result = await asyncio.to_thread(
+        orchestrator.build_full_result, dialogues, body.session_id
+    )
     session["structured"] = result.structured.model_dump()
     session["emr_text"] = result.emr_text
     session["risk_alerts"] = result.risk_alerts

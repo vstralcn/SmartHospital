@@ -213,4 +213,29 @@ export function deleteConsultation(id) {
   return api.delete(`/consultations/${id}`)
 }
 
+// --- Multi-Agent Monitor ---
+export function getAgentPipeline() {
+  return api.get('/agents/pipeline')
+}
+
+export function getMcpServers() {
+  return api.get('/agents/servers')
+}
+
+export function listAgentRuns(limit = 20) {
+  return api.get('/agents/runs', { params: { limit } })
+}
+
+export function getAgentRunByTask(taskId) {
+  return api.get(`/agents/runs/${taskId}`)
+}
+
+export function getAgentRunBySession(sessionId) {
+  return api.get(`/agents/runs/session/${sessionId}`)
+}
+
+export function getLatestAgentRun() {
+  return api.get('/agents/runs/latest')
+}
+
 export default api
