@@ -56,6 +56,7 @@ class QualityControlAgent(BaseAgent):
             pass
 
         audit["passed"] = not audit["issues"]
+        audit["score"] = max(0, 100 - len(audit["issues"]) * 15 - len(audit["risk_alerts"]) * 5)
         return {"quality_control": audit}
 
     def _audit(
