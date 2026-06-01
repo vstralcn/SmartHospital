@@ -1,0 +1,58 @@
+[
+  {
+    "name": "肌钙蛋白",
+    "aliases": ["cTnI", "cTnT", "troponin"],
+    "specimen": "静脉血",
+    "reference_range": "cTnI < 0.04 ng/mL",
+    "turnaround": "1小时",
+    "clinical_significance": "心肌损伤标志物，急性心肌梗死的重要诊断依据，升高提示心肌细胞坏死。"
+  },
+  {
+    "name": "心电图",
+    "aliases": ["ECG", "EKG"],
+    "specimen": "无创检查",
+    "reference_range": "窦性心律，无ST-T改变",
+    "turnaround": "即时",
+    "clinical_significance": "评估心律、心肌缺血及梗死定位，ST段抬高提示急性心肌梗死。"
+  },
+  {
+    "name": "心肌酶谱",
+    "aliases": ["CK-MB", "心肌酶"],
+    "specimen": "静脉血",
+    "reference_range": "CK-MB < 25 U/L",
+    "turnaround": "2小时",
+    "clinical_significance": "辅助判断心肌损伤范围及时间窗，与肌钙蛋白联合提高诊断敏感性。"
+  },
+  {
+    "name": "空腹血糖",
+    "aliases": ["FPG", "fasting glucose"],
+    "specimen": "静脉血（空腹8小时）",
+    "reference_range": "3.9-6.1 mmol/L",
+    "turnaround": "30分钟",
+    "clinical_significance": "糖尿病筛查与诊断指标，≥7.0 mmol/L 提示糖尿病可能。"
+  },
+  {
+    "name": "糖化血红蛋白",
+    "aliases": ["HbA1c"],
+    "specimen": "静脉血",
+    "reference_range": "4%-6%",
+    "turnaround": "2小时",
+    "clinical_significance": "反映近2-3个月平均血糖水平，≥6.5% 支持糖尿病诊断。"
+  },
+  {
+    "name": "血脂四项",
+    "aliases": ["血脂", "lipid panel"],
+    "specimen": "静脉血（空腹）",
+    "reference_range": "LDL-C < 3.4 mmol/L",
+    "turnaround": "2小时",
+    "clinical_significance": "评估动脉粥样硬化风险，LDL-C 升高是冠心病重要危险因素。"
+  },
+  {
+    "name": "肾功能",
+    "aliases": ["肌酐", "eGFR", "renal function"],
+    "specimen": "静脉血",
+    "reference_range": "肌酐 44-133 μmol/L",
+    "turnaround": "2小时",
+    "clinical_significance": "评估肾脏滤过功能，影响多种药物（如二甲双胍）的使用安全性。"
+  }
+]

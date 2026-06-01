@@ -1,0 +1,15 @@
+# Ruff configuration for the FastAPI backend.
+line-length = 100
+target-version = "py312"
+
+[lint]
+select = ["E", "F", "W", "I"]
+# Line-length is enforced by formatting/review rather than the linter; the
+# existing codebase contains many long Chinese-text and logging lines.
+ignore = ["E501"]
+
+[lint.per-file-ignores]
+# These modules intentionally manipulate sys.path before importing local
+# modules, so their imports cannot all sit at the very top of the file.
+"main.py" = ["E402"]
+"ws/audio_ws.py" = ["E402"]

@@ -8,7 +8,6 @@ from sqlalchemy.orm import Session, sessionmaker
 
 from models import Base
 
-
 _BACKEND_ROOT = Path(__file__).resolve().parent
 _DATABASE_PATH = _BACKEND_ROOT / "data" / "app.db"
 _DATABASE_URL = f"sqlite:///{_DATABASE_PATH}"
