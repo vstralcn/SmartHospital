@@ -8,19 +8,24 @@
         <h1>门诊问诊工作台</h1>
         <p>围绕问诊记录、结构化整理与病历生成构建的一体化辅助界面。</p>
       </div>
-      <div class="hero-meta">
-        <div class="meta-item" v-if="doctorUser">
-          <span>当前医生</span>
-          <strong>{{ doctorUser.full_name }}</strong>
+      <div class="hero-right">
+        <div class="hero-meta">
+          <div class="meta-item" v-if="doctorUser">
+            <span>当前医生</span>
+            <strong>{{ doctorUser.full_name }}</strong>
+          </div>
+          <div class="meta-item">
+            <span>当前状态</span>
+            <strong>{{ statusLabel }}</strong>
+          </div>
+          <div class="meta-item">
+            <span>会话 ID</span>
+            <strong>{{ sessionId || '未开始' }}</strong>
+          </div>
         </div>
-        <div class="meta-item">
-          <span>当前状态</span>
-          <strong>{{ statusLabel }}</strong>
-        </div>
-        <div class="meta-item">
-          <span>会话 ID</span>
-          <strong>{{ sessionId || '未开始' }}</strong>
-        </div>
+        <el-button type="primary" :icon="Connection" class="monitor-entry" @click="goMonitor">
+          智能体监控
+        </el-button>
       </div>
     </section>
 
@@ -66,6 +71,7 @@
 import { computed, ref, watch, onUnmounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { ElMessage, ElLoading, ElMessageBox } from 'element-plus'
+import { Connection } from '@element-plus/icons-vue'
 import TranscriptPanel from '../components/TranscriptPanel.vue'
 import StructuredPanel from '../components/StructuredPanel.vue'
 import EmrEditorPanel from '../components/EmrEditorPanel.vue'
@@ -336,6 +342,13 @@ function handleLogout() {
 
 .hero p {
   display: none;
+}
+
+.hero-right {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-shrink: 0;
 }
 
 .hero-meta {

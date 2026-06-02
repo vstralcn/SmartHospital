@@ -8,6 +8,7 @@
       </div>
       <div class="hero-actions">
         <el-button type="primary" @click="goBack">返回问诊</el-button>
+        <el-button :icon="Connection" @click="goMonitor">智能体监控</el-button>
         <el-button @click="handleLogout">退出登录</el-button>
       </div>
     </section>
@@ -118,6 +119,7 @@
 import { onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { ElMessage, ElMessageBox } from 'element-plus'
+import { Connection } from '@element-plus/icons-vue'
 import { listConsultations, getConsultation, deleteConsultation } from '../api'
 
 const router = useRouter()
@@ -180,6 +182,10 @@ async function confirmDelete(row) {
 
 function goBack() {
   router.push('/diagnosis')
+}
+
+function goMonitor() {
+  router.push('/agent-monitor')
 }
 
 function handleLogout() {
