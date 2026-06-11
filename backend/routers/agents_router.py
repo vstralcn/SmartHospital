@@ -25,6 +25,11 @@ _PIPELINE = [
         "description": "结合疾病知识库生成候选疾病与推理",
     },
     {
+        "name": "knowledge_agent",
+        "label": "知识检索",
+        "description": "RAG 向量检索循证医学知识为诊断提供参考",
+    },
+    {
         "name": "drug_agent",
         "label": "用药推荐",
         "description": "推荐药物并通过 MCP 工具检查禁忌",
@@ -38,6 +43,11 @@ _PIPELINE = [
         "name": "quality_control_agent",
         "label": "质控审核",
         "description": "审核病历完整性与逻辑一致性",
+    },
+    {
+        "name": "followup_agent",
+        "label": "随访计划",
+        "description": "生成复诊时间、复查项目与注意事项",
     },
 ]
 
