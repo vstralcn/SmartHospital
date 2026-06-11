@@ -97,6 +97,26 @@ class AgentLogService:
             for row in rows
         ]
 
+    def stats(self) -> Dict[str, Any]:
+        task_total = self.db.scalar(
+            select(func.count(func.distinct(AgentExecutionLog.task_id)))
+        ) or 0
+        execution_total = self.db.scalar(
+            select(func.count()).select_from(AgentExecutionLog)
+        ) or 0
+        token_total = self.db.scalar(
+            select(func.sum(AgentExecutionLog.total_tokens))
+        ) or 0
+        error_total = self.db.scalar(
+            select(func.count()).where(AgentExecutionLog.status == "error")
+        ) or 0
+        return {
+            "task_total": int(task_total),
+            "execution_total": int(execution_total),
+            "token_total": int(token_total),
+            "error_total": int(error_total),
+        }
+
     def _serialize(self, row: AgentExecutionLog) -> Dict[str, Any]:
         return {
             "id": row.id,
