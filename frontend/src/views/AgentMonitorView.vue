@@ -1,5 +1,6 @@
 <template>
   <div class="monitor-page medical-page">
+    <DoctorNav />
     <header class="monitor-header medical-card">
       <div class="title-block">
         <div class="hero-badge">Internet of Agents</div>
@@ -10,7 +11,6 @@
         <el-tag v-if="taskId" type="info" effect="plain">任务 {{ taskId }}</el-tag>
         <el-switch v-model="autoRefresh" active-text="自动刷新" />
         <el-button :loading="loading" @click="refresh">手动刷新</el-button>
-        <el-button text @click="goBack">返回工作台</el-button>
       </div>
     </header>
 
@@ -187,7 +187,8 @@
 
 <script setup>
 import { computed, onMounted, onUnmounted, ref } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
+import { useRoute } from 'vue-router'
+import DoctorNav from '../components/DoctorNav.vue'
 import {
   getAgentPipeline,
   getMcpServers,
@@ -198,7 +199,6 @@ import {
 } from '../api/index'
 
 const route = useRoute()
-const router = useRouter()
 
 const pipeline = ref([])
 const logs = ref([])
@@ -208,7 +208,7 @@ const taskId = ref('')
 const selectedAgent = ref('')
 const autoRefresh = ref(true)
 const loading = ref(false)
-const sessionId = ref(route.query.session || '')
+const sessionId = ref(route.query.session || localStorage.getItem('active_session_id') || '')
 
 let timer = null
 
@@ -316,9 +316,6 @@ async function loadRun(row) {
   applyRun(res.data)
 }
 
-function goBack() {
-  router.push('/diagnosis')
-}
 
 onMounted(async () => {
   try {

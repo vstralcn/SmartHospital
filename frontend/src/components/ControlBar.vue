@@ -16,18 +16,12 @@
     </div>
 
     <div class="right-section">
-      <el-button text @click="$emit('go-monitor')">智能体监控</el-button>
-      <el-button text @click="$emit('go-history')">问诊记录</el-button>
-      <el-divider direction="vertical" v-if="doctorUser" />
-      <el-dropdown v-if="doctorUser">
-        <span class="doctor-name">{{ doctorUser.full_name }}</span>
-        <template #dropdown>
-          <el-dropdown-menu>
-            <el-dropdown-item disabled>{{ doctorUser.department || '未设置科室' }}</el-dropdown-item>
-            <el-dropdown-item divided @click="$emit('logout')">退出登录</el-dropdown-item>
-          </el-dropdown-menu>
-        </template>
-      </el-dropdown>
+      <span class="status-chip">
+        <i>状态</i><strong>{{ statusLabel }}</strong>
+      </span>
+      <span class="status-chip">
+        <i>会话 ID</i><strong>{{ sessionId || '未开始' }}</strong>
+      </span>
     </div>
   </div>
 </template>
@@ -37,10 +31,10 @@ defineProps({
   status: { type: String, default: 'idle' },
   isRecording: { type: Boolean, default: false },
   sessionId: { type: String, default: '' },
-  doctorUser: { type: Object, default: null },
+  statusLabel: { type: String, default: '' },
 })
 
-defineEmits(['start', 'complete', 'save', 'export-docx', 'open-settings', 'go-history', 'go-monitor', 'logout'])
+defineEmits(['start', 'complete', 'save', 'export-docx', 'open-settings'])
 </script>
 
 <style scoped>
@@ -90,10 +84,25 @@ defineEmits(['start', 'complete', 'save', 'export-docx', 'open-settings', 'go-hi
   animation: blink 1s infinite;
 }
 
-.doctor-name {
-  font-weight: 600;
+.status-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border-radius: 10px;
+  background: var(--medical-primary-light);
+  white-space: nowrap;
+}
+
+.status-chip i {
+  font-style: normal;
+  color: var(--medical-muted);
+  font-size: 12px;
+}
+
+.status-chip strong {
+  font-size: 13px;
   color: var(--medical-primary);
-  cursor: pointer;
 }
 
 @keyframes blink {

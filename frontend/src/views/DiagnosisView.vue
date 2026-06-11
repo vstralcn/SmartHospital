@@ -1,33 +1,7 @@
 <template>
   <div class="diagnosis-page medical-page">
+    <DoctorNav class="page-nav" />
     <DisclaimerBanner />
-
-    <section class="hero medical-card">
-      <div>
-        <div class="hero-badge">智能问诊病历系统</div>
-        <h1>门诊问诊工作台</h1>
-        <p>围绕问诊记录、结构化整理与病历生成构建的一体化辅助界面。</p>
-      </div>
-      <div class="hero-right">
-        <div class="hero-meta">
-          <div class="meta-item" v-if="doctorUser">
-            <span>当前医生</span>
-            <strong>{{ doctorUser.full_name }}</strong>
-          </div>
-          <div class="meta-item">
-            <span>当前状态</span>
-            <strong>{{ statusLabel }}</strong>
-          </div>
-          <div class="meta-item">
-            <span>会话 ID</span>
-            <strong>{{ sessionId || '未开始' }}</strong>
-          </div>
-        </div>
-        <el-button type="primary" :icon="Connection" class="monitor-entry" @click="goMonitor">
-          智能体监控
-        </el-button>
-      </div>
-    </section>
 
     <div class="main-content">
       <div class="panel left-panel medical-card">
@@ -52,15 +26,12 @@
       :status="status"
       :isRecording="isRecording"
       :sessionId="sessionId"
-      :doctorUser="doctorUser"
+      :statusLabel="statusLabel"
       @start="handleStart"
       @complete="handleComplete"
       @save="handleSave"
       @export-docx="handleExportDocx"
       @open-settings="showSettings = true"
-      @go-history="goHistory"
-      @go-monitor="goMonitor"
-      @logout="handleLogout"
     />
 
     <SettingsDialog v-model:visible="showSettings" />
@@ -69,9 +40,8 @@
 
 <script setup>
 import { computed, ref, watch, onUnmounted } from 'vue'
-import { useRouter } from 'vue-router'
 import { ElMessage, ElLoading, ElMessageBox } from 'element-plus'
-import { Connection } from '@element-plus/icons-vue'
+import DoctorNav from '../components/DoctorNav.vue'
 import TranscriptPanel from '../components/TranscriptPanel.vue'
 import StructuredPanel from '../components/StructuredPanel.vue'
 import EmrEditorPanel from '../components/EmrEditorPanel.vue'
@@ -91,7 +61,6 @@ import {
   getSettings,
 } from '../api/index'
 
-const router = useRouter()
 const status = ref('idle')
 const sessionId = ref('')
 const dialogues = ref([])
@@ -184,6 +153,7 @@ async function handleStart() {
     const doctorId = doctorUser.value?.id || null
     const res = await startDiagnosis(doctorId)
     sessionId.value = res.data.session_id
+    localStorage.setItem('active_session_id', sessionId.value)
     dialogues.value = []
     structured.value = null
     emrText.value = ''
@@ -277,21 +247,6 @@ async function handleExportDocx() {
     ElMessage.error('导出失败：' + (err.message || '未知错误'))
   }
 }
-
-function goHistory() {
-  router.push('/consultations')
-}
-
-function goMonitor() {
-  router.push(sessionId.value ? { path: '/agent-monitor', query: { session: sessionId.value } } : '/agent-monitor')
-}
-
-function handleLogout() {
-  localStorage.removeItem('doctor_token')
-  localStorage.removeItem('doctor_user')
-  ElMessage.success('已退出登录')
-  router.push('/login')
-}
 </script>
 
 <style scoped>
@@ -303,80 +258,8 @@ function handleLogout() {
   width: 100%;
 }
 
-.hero {
-  margin: 8px 16px;
-  padding: 10px 16px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 16px;
-  background: linear-gradient(135deg, #fafdff 0%, #eef6ff 100%);
-  flex-shrink: 0;
-}
-
-.hero > div:first-child {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  min-width: 0;
-}
-
-.hero-badge {
-  display: inline-block;
-  padding: 4px 10px;
-  border-radius: 999px;
-  background: var(--medical-primary-light);
-  color: var(--medical-primary);
-  font-size: 12px;
-  font-weight: 700;
-  white-space: nowrap;
-  flex-shrink: 0;
-}
-
-.hero h1 {
-  margin: 0;
-  font-size: 18px;
-  font-weight: 700;
-  white-space: nowrap;
-}
-
-.hero p {
-  display: none;
-}
-
-.hero-right {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  flex-shrink: 0;
-}
-
-.hero-meta {
-  display: flex;
-  gap: 8px;
-  flex-shrink: 0;
-}
-
-.meta-item {
-  min-width: 0;
-  padding: 6px 12px;
-  border-radius: 10px;
-  background: #fff;
-  border: 1px solid var(--medical-border);
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
-
-.meta-item span {
-  color: var(--medical-muted);
-  font-size: 12px;
-  white-space: nowrap;
-}
-
-.meta-item strong {
-  font-size: 13px;
-  word-break: break-word;
+.page-nav {
+  margin: 12px 16px 0;
 }
 
 .main-content {
@@ -417,11 +300,6 @@ function handleLogout() {
 }
 
 @media (max-width: 768px) {
-  .hero {
-    margin: 6px 12px;
-    flex-wrap: wrap;
-  }
-
   .main-content {
     padding-left: 12px;
     padding-right: 12px;
