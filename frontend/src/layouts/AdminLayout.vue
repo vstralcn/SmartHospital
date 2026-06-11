@@ -13,6 +13,8 @@
         <el-menu-item index="/admin/models">模型配置</el-menu-item>
         <el-menu-item index="/admin/asr">语音识别</el-menu-item>
         <el-menu-item index="/admin/doctors">医生账号</el-menu-item>
+        <el-menu-item index="/admin/consultations">病例管理</el-menu-item>
+        <el-menu-item index="/admin/agents">智能体管理</el-menu-item>
       </el-menu>
     </aside>
 
