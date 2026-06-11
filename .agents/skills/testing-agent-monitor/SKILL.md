@@ -21,10 +21,10 @@ The UI voice flow (`开始诊断` -> record -> `完成诊断`) requires Tencent 
 ```
 SID=$(curl -s -X POST :8000/api/diagnosis/start -d '{"doctor_id":1}' -H 'Content-Type: application/json' | jq -r .session_id)
 curl -s -X POST :8000/api/diagnosis/transcribe -H 'Content-Type: application/json' \
-  -d "{\"session_id\":\"$SID\",\"dialogues\":[{\"speaker\":\"patient\",\"text\":\"高血压头晕，吃过氨氯地平"}]}"
+  -d "{\"session_id\":\"$SID\",\"dialogues\":[{\"speaker\":\"patient\",\"text\":\"高血压头晕，吃过氨氯地平\"}]}"
 curl -s -X POST :8000/api/diagnosis/complete -H 'Content-Type: application/json' -d "{\"session_id\":\"$SID\"}"
 ```
-With the Agent Monitor open (auto-refresh ON), the new run appears live. Use a dialogue mentioning symptoms + drug names (e.g. high blood pressure, 氨氯地平/美托洛尔) to exercise drug MCP tools.
+With the Agent Monitor open (auto-refresh ON), the new run appears live. Use a dialogue mentioning symptoms + drug names (e.g. high blood pressure, 氨氯地平/美托洛尔) to exercise drug MCP tools and to make cardiovascular RAG entries rank first.
 
 ## What to verify (UI)
 - `/agent-monitor` is behind the doctor auth guard -> logged-out visit redirects to `/login`.
