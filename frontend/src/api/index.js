@@ -213,6 +213,26 @@ export function deleteConsultation(id) {
   return api.delete(`/consultations/${id}`)
 }
 
+// --- Admin: all consultations across doctors ---
+export function adminListConsultations(params = {}) {
+  const { page = 1, pageSize = 20, doctorId = null, q = '' } = params
+  const query = { page, page_size: pageSize, q }
+  if (doctorId != null) query.doctor_id = doctorId
+  return api.get('/admin/consultations', { params: query })
+}
+
+export function adminGetConsultation(id) {
+  return api.get(`/admin/consultations/${id}`)
+}
+
+export function adminDeleteConsultation(id) {
+  return api.delete(`/admin/consultations/${id}`)
+}
+
+export function adminConsultationStats() {
+  return api.get('/admin/consultations/stats')
+}
+
 // --- Multi-Agent Monitor ---
 export function getAgentPipeline() {
   return api.get('/agents/pipeline')
@@ -236,6 +256,10 @@ export function getAgentRunBySession(sessionId) {
 
 export function getLatestAgentRun() {
   return api.get('/agents/runs/latest')
+}
+
+export function getAgentStats() {
+  return api.get('/agents/stats')
 }
 
 export default api

@@ -9,6 +9,8 @@ import AdminDashboardView from '../views/admin/AdminDashboardView.vue'
 import AdminModelsView from '../views/admin/AdminModelsView.vue'
 import AdminAsrView from '../views/admin/AdminAsrView.vue'
 import AdminDoctorsView from '../views/admin/AdminDoctorsView.vue'
+import AdminConsultationsView from '../views/admin/AdminConsultationsView.vue'
+import AdminAgentsView from '../views/admin/AdminAgentsView.vue'
 import { getAdminToken, getDoctorToken, getDoctorMe, getCurrentAdmin } from '../api/index'
 
 const routes = [
@@ -48,6 +50,8 @@ const routes = [
       { path: 'models', name: 'admin-models', component: AdminModelsView },
       { path: 'asr', name: 'admin-asr', component: AdminAsrView },
       { path: 'doctors', name: 'admin-doctors', component: AdminDoctorsView },
+      { path: 'consultations', name: 'admin-consultations', component: AdminConsultationsView },
+      { path: 'agents', name: 'admin-agents', component: AdminAgentsView },
     ],
   },
 ]

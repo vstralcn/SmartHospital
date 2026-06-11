@@ -20,6 +20,7 @@ from mcp.registry import MCPRegistry
 from routers import diagnosis, export, settings_router
 from routers.admin_asr_router import router as admin_asr_router
 from routers.admin_auth_router import router as admin_auth_router
+from routers.admin_consultation_router import router as admin_consultation_router
 from routers.admin_doctor_router import router as admin_doctor_router
 from routers.admin_model_router import router as admin_model_router
 from routers.agents_router import router as agents_router
@@ -81,6 +82,7 @@ app.include_router(admin_auth_router, tags=["admin-auth"])
 app.include_router(admin_model_router, tags=["admin-models"])
 app.include_router(admin_asr_router, tags=["admin-asr"])
 app.include_router(admin_doctor_router, tags=["admin-doctors"])
+app.include_router(admin_consultation_router, tags=["admin-consultations"])
 app.include_router(doctor_auth_router, tags=["doctor-auth"])
 app.include_router(consultation_router, tags=["consultations"])
 app.include_router(agents_router)
