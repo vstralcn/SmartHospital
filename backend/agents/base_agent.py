@@ -137,8 +137,10 @@ class BaseAgent:
             "session_id",
             "interview",
             "diagnosis",
+            "knowledge",
             "drug",
             "emr",
+            "quality_control",
         ]
         return {k: payload[k] for k in keys if k in payload}
 

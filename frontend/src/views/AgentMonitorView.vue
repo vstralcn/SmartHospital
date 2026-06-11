@@ -4,7 +4,7 @@
       <div class="title-block">
         <div class="hero-badge">Internet of Agents</div>
         <h1>多智能体协作监控</h1>
-        <p>实时观测问诊 → 诊断 → 用药 → 病历 → 质控 的智能体协作流水线。</p>
+        <p>实时观测问诊 → 诊断 → 知识检索(RAG) → 用药 → 病历 → 质控 → 随访 的智能体协作流水线。</p>
       </div>
       <div class="header-actions">
         <el-tag v-if="taskId" type="info" effect="plain">任务 {{ taskId }}</el-tag>
@@ -130,6 +130,58 @@
         </div>
       </div>
     </section>
+
+    <section class="insight-grid">
+      <div class="insight-panel medical-card">
+        <div class="medical-section-title">知识参考 (RAG)</div>
+        <div v-if="knowledgeResult && knowledgeResult.references && knowledgeResult.references.length">
+          <p class="insight-summary">{{ knowledgeResult.summary }}</p>
+          <div
+            v-for="(ref, i) in knowledgeResult.references"
+            :key="i"
+            class="reference-card"
+          >
+            <div class="reference-head">
+              <span class="reference-title">{{ ref.title }}</span>
+              <el-tag size="small" effect="plain" type="success">相关度 {{ ref.score }}</el-tag>
+            </div>
+            <div class="reference-snippet">{{ ref.snippet }}</div>
+            <div class="reference-source" v-if="ref.source">来源：{{ ref.source }}</div>
+          </div>
+        </div>
+        <div v-else class="muted">尚未检索到知识参考，运行一次问诊后展示。</div>
+      </div>
+
+      <div class="insight-panel medical-card">
+        <div class="medical-section-title">随访计划</div>
+        <div v-if="followUpPlan">
+          <div class="followup-row">
+            <span class="followup-label">复诊建议</span>
+            <span class="followup-value">{{ followUpPlan.next_visit }}</span>
+          </div>
+          <div class="followup-row">
+            <span class="followup-label">复查项目</span>
+            <div class="followup-tags">
+              <el-tag
+                v-for="(item, i) in followUpPlan.review_items"
+                :key="i"
+                size="small"
+                effect="plain"
+              >
+                {{ item }}
+              </el-tag>
+            </div>
+          </div>
+          <div class="followup-row column">
+            <span class="followup-label">注意事项</span>
+            <ul class="followup-list">
+              <li v-for="(item, i) in followUpPlan.precautions" :key="i">{{ item }}</li>
+            </ul>
+          </div>
+        </div>
+        <div v-else class="muted">尚未生成随访计划，运行一次问诊后展示。</div>
+      </div>
+    </section>
   </div>
 </template>
 
@@ -193,6 +245,18 @@ const overallTagType = computed(
 )
 
 const selectedLog = computed(() => logsByName.value[selectedAgent.value] || null)
+
+const knowledgeResult = computed(() => {
+  const log = logsByName.value['knowledge_agent']
+  const payload = log && log.output_payload ? log.output_payload.knowledge : null
+  return payload || null
+})
+
+const followUpPlan = computed(() => {
+  const log = logsByName.value['followup_agent']
+  const payload = log && log.output_payload ? log.output_payload.follow_up : null
+  return payload || null
+})
 
 function statusLabel(status) {
   return { success: '成功', error: '异常', running: '执行中', pending: '等待' }[status] || status
@@ -593,11 +657,99 @@ onUnmounted(() => {
   }
 }
 
+.insight-grid {
+  display: grid;
+  grid-template-columns: 1.2fr 1fr;
+  gap: 16px;
+}
+
+.insight-panel {
+  padding: 18px 22px;
+}
+
+.insight-summary {
+  color: var(--medical-muted);
+  font-size: 13px;
+  margin: 0 0 12px;
+  line-height: 1.6;
+}
+
+.reference-card {
+  border: 1px solid var(--medical-border, #e4e7ed);
+  border-radius: 10px;
+  padding: 10px 12px;
+  margin-bottom: 10px;
+  background: var(--medical-primary-light, #f5f9ff);
+}
+
+.reference-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 6px;
+}
+
+.reference-title {
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.reference-snippet {
+  font-size: 13px;
+  line-height: 1.6;
+  color: var(--medical-text, #303133);
+}
+
+.reference-source {
+  margin-top: 6px;
+  font-size: 12px;
+  color: var(--medical-muted);
+}
+
+.followup-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+.followup-row.column {
+  flex-direction: column;
+}
+
+.followup-label {
+  flex: 0 0 72px;
+  font-weight: 600;
+  font-size: 13px;
+  color: var(--medical-primary);
+}
+
+.followup-value {
+  font-size: 14px;
+}
+
+.followup-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.followup-list {
+  margin: 4px 0 0;
+  padding-left: 18px;
+  font-size: 13px;
+  line-height: 1.7;
+}
+
 @media (max-width: 1024px) {
   .metrics {
     grid-template-columns: repeat(2, 1fr);
   }
   .detail-grid {
+    grid-template-columns: 1fr;
+  }
+  .insight-grid {
     grid-template-columns: 1fr;
   }
 }

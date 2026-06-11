@@ -18,8 +18,8 @@
 │ Agent Monitor │  └─────┬─────┘  └──────┬──────┘  │
 │              │        │               │          │
 │              │  ┌─────┴───────────────┴──────┐  │
-│              │  │  Orchestrator + 5 Agents    │  │
-│              │  │  MCP(Drug·Disease·Lab)·ASR  │  │
+│              │  │  Orchestrator + 7 Agents    │  │
+│              │  │ MCP·RAG(向量库)·ASR·LangGraph│  │
 │              │  └─────────────┬───────────────┘  │
 │              │          ┌─────┴─────┐            │
 │              │          │ SQLite DB │            │
@@ -41,7 +41,8 @@
 | **文档导出** | python-docx（DOCX 格式） |
 | **日志** | Loguru |
 | **部署** | Docker Compose + Nginx 反向代理 |
-| **多智能体** | LangChain Core + 自研 Orchestrator + A2A 消息协议 |
+| **多智能体** | LangChain + LangGraph `StateGraph` 编排 + A2A 消息协议 |
+| **知识检索** | RAG（LangChain 向量库 + 本地 Embeddings，离线可用） |
 | **工具协议** | 模拟 MCP（Model Context Protocol）服务 |
 
 ---
@@ -50,37 +51,37 @@
 
 本系统将原本「单体式 LLM 一次性生成病历」的逻辑，重构为遵循 **Internet of Agents (IoA)** 理念的**多智能体协作系统**：每个智能体只负责单一职责、拥有明确的 JSON 输出契约，并且**只能通过标准化消息（AgentMessage）通信，禁止任何直接的变量共享**。这种设计带来更强的可解释性、可观测性与可扩展性，便于在比赛与生产中独立演进、替换或并行化每个智能体。
 
-### 五大智能体（Agent Workflow）
+### 七大智能体（Agent Workflow）
 
-由 `Orchestrator` 按固定顺序串联，上一个智能体的输出经消息传递给下一个：
+由 `Orchestrator`（LangGraph `StateGraph`）按固定顺序编排，上一个智能体的输出经 A2A 消息传递给下一个：
 
 ```
 ASR 转写
    │
    ▼
-┌──────────────┐   ┌──────────────┐   ┌──────────────┐   ┌──────────────┐   ┌───────────────────┐
-│ InterviewAgent│ → │ DiagnosisAgent│ → │  DrugAgent    │ → │   EMRAgent    │ → │ QualityControlAgent│
-│  问诊采集      │   │  诊断推理      │   │  用药推荐      │   │  病历整合      │   │  质控审核           │
-└──────────────┘   └──────┬───────┘   └──────┬───────┘   └──────────────┘   └───────────────────┘
-                          │ MCP            │ MCP
-                          ▼                ▼
-                   DiseaseServer      DrugServer / LabServer
+InterviewAgent → DiagnosisAgent → KnowledgeAgent → DrugAgent → EMRAgent → QualityControlAgent → FollowUpAgent
+  问诊采集          诊断推理          知识检索(RAG)     用药推荐      病历整合      质控审核              随访计划
+                      │ MCP             │ RAG            │ MCP
+                      ▼                 ▼                ▼
+                 DiseaseServer      向量知识库       DrugServer / LabServer
 ```
 
-| 智能体 | 职责 | 关键输出字段 | 调用的 MCP 工具 |
+| 智能体 | 职责 | 关键输出字段 | 协作工具 |
 |--------|------|--------------|------------------|
 | **InterviewAgent** | 从 ASR 转写中提取主诉、现病史、症状、既往史 | `chief_complaint` / `present_illness` / `symptoms` | — |
-| **DiagnosisAgent** | 基于问诊结果生成候选疾病与诊断推理 | `primary_diagnosis` / `candidate_diseases` / `reasoning` | `match_by_symptoms` / `query_disease` |
-| **DrugAgent** | 推荐药物并核查禁忌/相互作用 | `recommendations` / `contraindication_alerts` | `search_drug` / `check_contraindication` |
+| **DiagnosisAgent** | 基于问诊结果生成候选疾病与诊断推理 | `primary_diagnosis` / `candidate_diseases` / `reasoning` | MCP `match_by_symptoms` / `query_disease` |
+| **KnowledgeAgent** | RAG 向量检索循证医学知识，提供带来源的参考与摘要 | `references` / `summary` | RAG `rag_search`（向量库） |
+| **DrugAgent** | 推荐药物并核查禁忌/相互作用 | `recommendations` / `contraindication_alerts` | MCP `search_drug` / `check_contraindication` |
 | **EMRAgent** | 汇总上游全部输出，生成结构化病历与病历文本 | `structured` / `emr_text` | — |
 | **QualityControlAgent** | 审核病历完整性与逻辑一致性，给出评分与风险提示 | `passed` / `score` / `issues` / `risk_alerts` | — |
+| **FollowUpAgent** | 根据诊断与病历生成随访计划 | `next_visit` / `review_items` / `precautions` | — |
 
 ### Orchestrator（编排器）
 
 `backend/agents/orchestrator.py` 负责：
 
 1. 为每次问诊生成唯一 `task_id`，创建初始 `AgentMessage`；
-2. 依序调用 5 个智能体，将每个智能体的输出封装为新的 `AgentMessage` 传递给下一个（A2A 链式传递）；
+2. 将 7 个智能体编译为 **LangGraph `StateGraph`** 状态机，节点间以 `AgentMessage` 为唯一状态通道依次流转（A2A 链式传递）；
 3. 通过 `log_sink` 回调把每个智能体的执行记录（耗时、Token、工具调用、I/O、状态）写入 `agent_execution_log`；
 4. `build_full_result()` 作为旧单体 EMR 服务的**直接替代**，返回与原接口兼容的 `EMRGenerationResult`，因此前端与既有 API 无需改动即可切换到多智能体流水线。
 
@@ -90,15 +91,20 @@ ASR 转写
 
 ```python
 class AgentMessage(BaseModel):
+    message_id: str     # 全局唯一消息 ID
     task_id: str        # 贯穿整条流水线，用于关联同一次问诊的所有日志
-    source: str         # 发送方智能体名（或 "orchestrator"）
-    target: str         # 接收方智能体名
+    source: str         # 发送方智能体名 from_agent（或 "orchestrator"）
+    target: str         # 接收方智能体名 to_agent
     timestamp: str      # ISO 8601 时间戳
-    payload: dict       # 累积的结构化数据（interview / diagnosis / drug / emr / quality_control）
+    message_type: str   # MessageType: task_request / task_result / knowledge_query / ...
+    payload: dict       # 累积的结构化数据（interview / diagnosis / knowledge / drug / emr / quality_control / follow_up）
 ```
 
 - 下游消息通过 `message.reply(source, target, payload)` 创建，自动继承 `task_id` 并合并 payload；
-- 智能体之间**不共享任何可变全局状态**，符合 IoA「以消息为唯一耦合面」的原则。
+- 智能体之间**不共享任何可变全局状态**，符合 IoA「以消息为唯一耦合面」的原则；
+- 消息类型由 `MessageType`（`task_request` / `task_result` / `knowledge_query` / `knowledge_result` / `consensus_vote`）定义。
+
+> 详细设计见 [`docs/DESIGN.md`](docs/DESIGN.md)、架构与流程图见 [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md)、各智能体提示词见 [`docs/PROMPTS.md`](docs/PROMPTS.md)。
 
 ### MCP 服务设计（Model Context Protocol 模拟）
 
@@ -127,12 +133,12 @@ class AgentMessage(BaseModel):
   | `GET /api/agents/runs/session/{session_id}` | 指定会话的最近一次运行 |
   | `GET /api/agents/runs/{task_id}` | 指定任务的完整日志 |
 
-- **前端「智能体监控」面板**（`/agent-monitor`，Vue3 + Element Plus）：以**流程图**形式可视化 5 个智能体节点的实时执行状态、每个节点的执行耗时与 Token 用量，点击节点可查看其 MCP 工具调用与输入/输出 payload，并提供运行历史与 MCP 服务清单。面板默认每 1.5s 轮询后端，实时反映 Orchestrator 的执行进度。
+- **前端「智能体监控」面板**（`/agent-monitor`，Vue3 + Element Plus）：以**流程图**形式可视化 7 个智能体节点的实时执行状态、每个节点的执行耗时与 Token 用量，点击节点可查看其 MCP/RAG 工具调用与输入/输出 payload；并独立展示 **知识参考(RAG)** 与 **随访计划** 面板，提供运行历史与 MCP 服务清单。面板默认每 1.5s 轮询后端，实时反映 Orchestrator 的执行进度。
 
 ### 如何运行多智能体流程
 
 1. 启动后端与前端（见下方「快速开始」）。无需任何外部 LLM 密钥即可体验——默认 `mock` Provider 会驱动完整流水线，MCP 工具调用为真实的本地查询。
-2. 医生端开始一次问诊（或在「智能体监控」中查看历史运行）。完成问诊时，`/api/diagnosis/complete` 会触发 `Orchestrator` 依次运行 5 个智能体并落库日志。
+2. 医生端开始一次问诊（或在「智能体监控」中查看历史运行）。完成问诊时，`/api/diagnosis/complete` 会触发 `Orchestrator`（LangGraph）依次运行 7 个智能体并落库日志。
 3. 打开顶部导航「**智能体监控**」进入 `/agent-monitor`，即可看到本次问诊的智能体协作流程图与实时指标。
 
 > 说明：生成内容仅作为医生书写病历的辅助草稿，需由医生审核确认。
@@ -165,7 +171,8 @@ HospitalWeb/
 │   ├── main.py                 # FastAPI 应用入口
 │   ├── database.py             # SQLAlchemy 数据库配置
 │   ├── config/settings.yaml    # 应用配置
-│   ├── agents/                 # 多智能体 (BaseAgent / 5 Agents / Orchestrator / A2A 消息)
+│   ├── agents/                 # 多智能体 (BaseAgent / 7 Agents / LangGraph Orchestrator / A2A 消息)
+│   ├── data/                   # RAG 医学知识语料 (medical_knowledge.json)
 │   ├── mcp/                    # 模拟 MCP 工具服务 (Drug / Disease / Lab + JSON 种子)
 │   ├── models/                 # 数据模型 (SQLAlchemy / Pydantic, 含 agent_execution_log)
 │   ├── routers/                # API 路由 (含 agents_router 监控接口)
