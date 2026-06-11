@@ -84,6 +84,7 @@ async function handleLogout() {
   }
   localStorage.removeItem('doctor_token')
   localStorage.removeItem('doctor_user')
+  localStorage.removeItem('active_session_id')
   ElMessage.success('已退出登录')
   router.push('/login')
 }

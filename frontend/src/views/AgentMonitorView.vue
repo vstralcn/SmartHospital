@@ -208,7 +208,7 @@ const taskId = ref('')
 const selectedAgent = ref('')
 const autoRefresh = ref(true)
 const loading = ref(false)
-const sessionId = ref(route.query.session || '')
+const sessionId = ref(route.query.session || localStorage.getItem('active_session_id') || '')
 
 let timer = null
 

@@ -153,6 +153,7 @@ async function handleStart() {
     const doctorId = doctorUser.value?.id || null
     const res = await startDiagnosis(doctorId)
     sessionId.value = res.data.session_id
+    localStorage.setItem('active_session_id', sessionId.value)
     dialogues.value = []
     structured.value = null
     emrText.value = ''
