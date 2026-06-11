@@ -23,6 +23,8 @@
           <div class="page-desc">统一管理模型配置、账号与系统状态</div>
         </div>
         <div class="topbar-actions">
+          <el-button text :icon="User" @click="goDoctor">返回医生工作台</el-button>
+          <el-divider direction="vertical" />
           <el-dropdown>
             <span class="admin-user">{{ adminName }}</span>
             <template #dropdown>
@@ -45,6 +47,7 @@
 import { computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
+import { User } from '@element-plus/icons-vue'
 import { logoutAdmin } from '../api'
 
 const route = useRoute()
@@ -60,6 +63,10 @@ const adminName = computed(() => {
     return '管理员'
   }
 })
+
+function goDoctor() {
+  router.push('/diagnosis')
+}
 
 async function handleLogout() {
   try {
