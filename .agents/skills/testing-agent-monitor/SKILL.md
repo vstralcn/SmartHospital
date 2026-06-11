@@ -34,7 +34,7 @@ With the Agent Monitor open (auto-refresh ON), the new run appears live. Use a d
 - `运行历史` gains new rows; clicking a row loads that run into the flowchart. MCP 服务 panel lists Drug/Disease/Lab + tools.
 
 ## Concurrency check (race-condition fix, shell)
-Fire several `/complete` runs in parallel, then assert each `task_id` has exactly 5 unique agent logs, all `success`, with consistent token sums:
+Fire several `/complete` runs in parallel, then assert each `task_id` has exactly 7 unique agent logs, all `success`, with consistent token sums:
 ```sql
 select task_id, count(*), count(distinct agent_name) from agent_execution_log group by task_id;
 ```
@@ -42,7 +42,7 @@ logs table lives in `backend/data/app.db`. Per-task corruption (duplicate/missin
 
 ## Notes
 - No CI / GitHub Actions configured (Devin Review only).
-- `/api/agents/*` endpoints are unauthenticated (read-only observability); the `/agent-monitor` route requires a doctor token in the browser.
+- `/api/agents/*` endpoints are unauthenticated (read-only observability); the `/agent-monitor` route requires a doctor token in the browser. The admin `/api/admin/consultations*` endpoints DO require an admin token (`Depends(get_current_admin)`).
 
 ## Devin Secrets Needed
-- None for the mock-provider path. Real LLM/ASR testing would need `OPENAI_API_KEY` and Tencent ASR credentials (configured via the admin panel), which are not required for verifying the multi-agent pipeline or dashboard.
+- None for the mock-provider path. Real LLM/ASR testing would need `OPENAI_API_KEY` and Tencent ASR credentials (configured via the admin panel), which are not required for verifying the multi-agent pipeline, dashboard, or admin pages.
