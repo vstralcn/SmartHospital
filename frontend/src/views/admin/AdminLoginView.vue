@@ -18,6 +18,10 @@
           登录后台
         </el-button>
       </el-form>
+
+      <div class="login-footer">
+        <el-button text size="small" @click="goDoctor">返回医生入口</el-button>
+      </div>
     </div>
   </div>
 </template>
@@ -46,6 +50,10 @@ async function handleLogin() {
   } finally {
     loading.value = false
   }
+}
+
+function goDoctor() {
+  router.push('/login')
 }
 </script>
 
@@ -92,5 +100,10 @@ async function handleLogin() {
 
 .submit-btn {
   width: 100%;
+}
+
+.login-footer {
+  margin-top: 16px;
+  text-align: center;
 }
 </style>

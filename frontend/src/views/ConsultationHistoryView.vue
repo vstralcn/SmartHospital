@@ -1,5 +1,6 @@
 <template>
   <div class="consultation-history medical-page">
+    <DoctorNav />
     <section class="hero medical-card">
       <div>
         <div class="hero-badge">问诊记录</div>
@@ -7,9 +8,7 @@
         <p>查看和管理已完成的问诊会话记录</p>
       </div>
       <div class="hero-actions">
-        <el-button type="primary" @click="goBack">返回问诊</el-button>
-        <el-button :icon="Connection" @click="goMonitor">智能体监控</el-button>
-        <el-button @click="handleLogout">退出登录</el-button>
+        <el-tag type="info" effect="plain" size="large">共 {{ total }} 条记录</el-tag>
       </div>
     </section>
 
@@ -117,12 +116,10 @@
 
 <script setup>
 import { onMounted, ref } from 'vue'
-import { useRouter } from 'vue-router'
 import { ElMessage, ElMessageBox } from 'element-plus'
-import { Connection } from '@element-plus/icons-vue'
 import { listConsultations, getConsultation, deleteConsultation } from '../api'
+import DoctorNav from '../components/DoctorNav.vue'
 
-const router = useRouter()
 const loading = ref(false)
 const records = ref([])
 const currentPage = ref(1)
@@ -178,21 +175,6 @@ async function confirmDelete(row) {
   } catch {
     // cancelled
   }
-}
-
-function goBack() {
-  router.push('/diagnosis')
-}
-
-function goMonitor() {
-  router.push('/agent-monitor')
-}
-
-function handleLogout() {
-  localStorage.removeItem('doctor_token')
-  localStorage.removeItem('doctor_user')
-  ElMessage.success('已退出登录')
-  router.push('/login')
 }
 </script>
 

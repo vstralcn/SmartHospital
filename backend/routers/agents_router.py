@@ -70,6 +70,11 @@ def list_runs(limit: int = 20, db: Session = Depends(get_db)) -> dict:
     return {"runs": AgentLogService(db).list_recent_tasks(limit=limit)}
 
 
+@router.get("/stats")
+def agent_stats(db: Session = Depends(get_db)) -> dict:
+    return AgentLogService(db).stats()
+
+
 @router.get("/runs/latest")
 def latest_run(db: Session = Depends(get_db)) -> dict:
     service = AgentLogService(db)

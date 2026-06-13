@@ -24,11 +24,21 @@
     </section>
 
     <section class="medical-card info-card">
+      <div class="medical-section-title">快捷入口</div>
+      <div class="quick-links">
+        <el-button @click="router.push('/admin/consultations')">病例管理</el-button>
+        <el-button @click="router.push('/admin/agents')">智能体管理</el-button>
+        <el-button @click="router.push('/admin/doctors')">医生账号</el-button>
+        <el-button @click="router.push('/admin/models')">模型配置</el-button>
+      </div>
+    </section>
+
+    <section class="medical-card info-card">
       <div class="medical-section-title">系统概览</div>
       <ul>
         <li>模型配置统一由数据库管理，激活后问诊页将直接使用当前活动配置。</li>
         <li>API Key 在列表中默认脱敏展示，编辑时留空表示不修改。</li>
-        <li>可在“模型配置”中执行连通性测试与启用切换。</li>
+        <li>「病例管理」可查看全部医生的问诊病历，「智能体管理」可追溯每次流水线的执行详情。</li>
       </ul>
     </section>
   </div>
@@ -36,7 +46,10 @@
 
 <script setup>
 import { computed, onMounted, reactive, ref } from 'vue'
+import { useRouter } from 'vue-router'
 import { listDoctors, listModelConfigs, listAsrConfigs } from '../../api'
+
+const router = useRouter()
 
 const models = ref([])
 const doctors = ref([])
@@ -103,5 +116,12 @@ onMounted(loadData)
   padding-left: 20px;
   color: var(--medical-text);
   line-height: 1.8;
+}
+
+.quick-links {
+  margin-top: 16px;
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
 }
 </style>
