@@ -8,7 +8,7 @@
       <el-tag v-if="isRecording" type="danger" effect="dark" size="small">采集中</el-tag>
     </div>
 
-    <div class="transcript-list">
+    <div ref="listRef" class="transcript-list">
       <el-table :data="dialogues" style="width: 100%" size="small">
         <el-table-column prop="start" label="时间" width="78">
           <template #default="{ row }">{{ formatTime(row.start) }}</template>
@@ -40,14 +40,27 @@
 </template>
 
 <script setup>
+import { ref, watch, nextTick } from 'vue'
 import { Microphone } from '@element-plus/icons-vue'
 
-defineProps({
+const props = defineProps({
   dialogues: { type: Array, default: () => [] },
   partialText: { type: String, default: '' },
   suggestions: { type: Array, default: () => [] },
   isRecording: { type: Boolean, default: false },
 })
+
+const listRef = ref(null)
+
+// Keep the newest line in view so all sentences are visible in real time.
+watch(
+  () => [props.dialogues.length, props.partialText],
+  async () => {
+    await nextTick()
+    const el = listRef.value
+    if (el) el.scrollTop = el.scrollHeight
+  },
+)
 
 function formatTime(seconds) {
   const s = Math.max(0, Math.floor(seconds))
