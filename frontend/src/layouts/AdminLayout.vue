@@ -89,11 +89,17 @@ async function handleLogout() {
   grid-template-columns: 260px 1fr;
   gap: 20px;
   min-height: 100vh;
+  min-height: 100dvh;
   padding: 20px;
 }
 
 .sidebar {
   padding: 20px 14px;
+  align-self: start;
+  position: sticky;
+  top: 20px;
+  max-height: calc(100dvh - 40px);
+  overflow-y: auto;
 }
 
 .brand {
@@ -172,6 +178,11 @@ async function handleLogout() {
 @media (max-width: 960px) {
   .admin-layout {
     grid-template-columns: 1fr;
+  }
+
+  .sidebar {
+    position: static;
+    max-height: none;
   }
 }
 </style>
