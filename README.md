@@ -156,10 +156,17 @@ class AgentMessage(BaseModel):
 
 ### 管理后台
 - **管理员登录** — 独立认证体系
-- **仪表盘** — 系统概览
+- **仪表盘** — 系统概览与各模块快捷入口
 - **医生管理** — 增删改查医生账号
 - **模型配置** — LLM Provider / 模型 / 参数动态配置
 - **ASR 配置** — 语音识别引擎参数管理
+- **病例管理** — 查看**全部医生**的问诊病历（按医生/关键字筛选、查看详情抽屉、删除），管理员专用接口 `admin_consultation_router`
+- **智能体管理** — 全部智能体运行记录与统计（任务数/执行次数/Token/异常）、7 节点流水线总览、运行下钻（逐 Agent 输入输出与工具调用）与 MCP 服务面板
+
+### 统一导航与跨端互通
+- **医生端统一顶部导航**（`DoctorNav`）：品牌 + 高亮当前页的「问诊工作台 / 问诊记录 / 智能体监控」+ 医生信息下拉（科室 / 管理员后台 / 退出），三页复用，导航上下文（如当前会话）随路由保持。
+- **管理员 ↔ 医生互通**：管理后台侧栏提供「返回医生工作台」入口；管理员登录页与医生登录页互设对方入口，实现两端一键跳转。
+- **自适应布局**：页面容器统一采用 `min-height: 100dvh` 随文档自然滚动（替代旧的 `height:100%; overflow:hidden`），修复长内容页面底部被裁剪、无法滚动的问题；后台侧栏 `sticky` 常驻，问诊工作台保持底部操作栏固定的 app-shell 布局，并适配移动端浏览器地址栏。
 
 ## 项目结构
 
@@ -175,7 +182,7 @@ HospitalWeb/
 │   ├── data/                   # RAG 医学知识语料 (medical_knowledge.json)
 │   ├── mcp/                    # 模拟 MCP 工具服务 (Drug / Disease / Lab + JSON 种子)
 │   ├── models/                 # 数据模型 (SQLAlchemy / Pydantic, 含 agent_execution_log)
-│   ├── routers/                # API 路由 (含 agents_router 监控接口)
+│   ├── routers/                # API 路由 (含 agents_router 监控接口、admin_consultation_router 全病例管理)
 │   ├── services/               # 业务逻辑层 (含 agent_log_service)
 │   ├── providers/              # LLM Provider 抽象 (OpenAI / Local / Mock)
 │   ├── prompts/                # LLM Prompt 模板
@@ -184,8 +191,8 @@ HospitalWeb/
 │   └── data/                   # 运行时数据 (SQLite DB / 临时文件)
 ├── frontend/
 │   ├── src/
-│   │   ├── views/              # 页面视图 (含 AgentMonitorView 智能体监控)
-│   │   ├── components/         # 可复用组件
+│   │   ├── views/              # 页面视图 (含 AgentMonitorView 智能体监控、admin/ 后台病例与智能体管理)
+│   │   ├── components/         # 可复用组件 (含 DoctorNav 统一顶部导航)
 │   │   ├── api/                # API 请求封装
 │   │   ├── composables/        # Vue 组合式函数
 │   │   ├── router/             # 路由配置
