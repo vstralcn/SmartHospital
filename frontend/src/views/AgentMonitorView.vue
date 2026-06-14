@@ -338,8 +338,6 @@ onUnmounted(() => {
 
 <style scoped>
 .monitor-page {
-  height: 100%;
-  overflow-y: auto;
   padding: 16px;
   display: flex;
   flex-direction: column;
