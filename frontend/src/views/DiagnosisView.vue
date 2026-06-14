@@ -86,25 +86,45 @@ const statusLabel = computed(() => {
   return '待开始'
 })
 
+let isDraining = false
+
+async function drainTranscripts() {
+  if (isDraining || !sessionId.value) return
+  isDraining = true
+  try {
+    // Send pending final segments one batch at a time. Serializing the
+    // requests prevents concurrent ASR finals from resolving out of order and
+    // overwriting the transcript with a stale (shorter) server snapshot, which
+    // previously made only the first few sentences show up in real time.
+    while (sessionId.value && finalTexts.value.length > lastSentIndex) {
+      const from = lastSentIndex
+      const batch = finalTexts.value.slice(from)
+      const segments = batch.map((item) => ({
+        text: item.text,
+        start: item.start ?? 0,
+        end: item.end ?? item.start ?? 0,
+      }))
+
+      try {
+        const res = await transcribeDialogues(sessionId.value, segments)
+        lastSentIndex = from + batch.length
+        dialogues.value = res.data.dialogues || dialogues.value
+      } catch (err) {
+        // Leave lastSentIndex untouched so this batch is retried on the next
+        // final result instead of being silently dropped.
+        console.error('Failed to send transcription:', err)
+        break
+      }
+    }
+  } finally {
+    isDraining = false
+  }
+}
+
 watch(
   () => finalTexts.value.length,
-  async (newLen) => {
-    if (newLen <= lastSentIndex || !sessionId.value) return
-    const newTexts = finalTexts.value.slice(lastSentIndex)
-    lastSentIndex = newLen
-
-    const segments = newTexts.map((item) => ({
-      text: item.text,
-      start: item.start ?? 0,
-      end: item.end ?? item.start ?? 0,
-    }))
-
-    try {
-      const res = await transcribeDialogues(sessionId.value, segments)
-      dialogues.value = res.data.dialogues || []
-    } catch (err) {
-      console.error('Failed to send transcription:', err)
-    }
+  () => {
+    drainTranscripts()
   },
 )
 

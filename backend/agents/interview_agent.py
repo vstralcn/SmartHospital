@@ -15,6 +15,26 @@ _SYMPTOM_KEYWORDS = [
     "出汗", "大汗", "心前区不适", "放射痛", "烧心", "反酸", "呼吸困难",
 ]
 
+# Keyword sets for the heuristic history extraction. They let the agent
+# populate 既往史/手术史/过敏史/用药史/家族史 directly from the transcript even
+# when no real LLM is configured (or the LLM call fails / returns blanks),
+# instead of leaving every history field empty ("待补充").
+_PAST_HISTORY_KEYWORDS = [
+    "既往", "病史", "以前", "之前", "多年", "患过", "得过", "确诊", "诊断",
+    "高血压", "糖尿病", "冠心病", "心脏病", "脑梗", "脑卒中", "中风", "哮喘",
+    "乙肝", "肝炎", "肾病", "甲亢", "高血脂", "高血糖", "慢性", "结核",
+]
+_SURGICAL_KEYWORDS = ["手术", "切除", "开刀", "置换", "术后", "造影", "支架"]
+_ALLERGY_KEYWORDS = ["过敏", "皮疹", "青霉素", "头孢"]
+_MEDICATION_KEYWORDS = [
+    "服用", "口服", "在吃", "吃药", "服药", "用药", "正在吃", "长期吃",
+    "降压药", "降糖药", "他汀", "阿司匹林", "硝酸甘油", "胰岛素", "服了",
+]
+_FAMILY_KEYWORDS = [
+    "家族", "家里人", "遗传", "父亲", "母亲", "父母", "爸爸", "妈妈",
+    "爷爷", "奶奶", "外公", "外婆", "兄弟", "姐妹", "哥哥", "弟弟", "姐姐",
+]
+
 
 class InterviewAgent(BaseAgent):
     """Extracts chief complaint, symptoms and history from ASR transcripts."""
@@ -65,25 +85,51 @@ class InterviewAgent(BaseAgent):
         symptoms = [kw for kw in _SYMPTOM_KEYWORDS if kw in blob]
 
         chief = source[0][:80] if source else ""
-        present = "；".join(source[:4]) if source else ""
+        present = "；".join(source) if source else ""
+
+        # History lives in the answers, not the doctor's questions, so drop
+        # interrogative lines to avoid pulling "有没有高血压？" into 既往史.
+        statement_lines = [
+            line for line in all_lines if "？" not in line and "?" not in line
+        ]
+        past_history = self._collect(statement_lines, _PAST_HISTORY_KEYWORDS)
+        surgical_history = self._collect(statement_lines, _SURGICAL_KEYWORDS)
+        allergy_history = self._collect(statement_lines, _ALLERGY_KEYWORDS)
+        medication_history = self._collect(statement_lines, _MEDICATION_KEYWORDS)
+        family_history = self._collect(statement_lines, _FAMILY_KEYWORDS)
 
         missing: List[str] = []
         if not chief:
             missing.append("主诉")
         if not present:
             missing.append("现病史")
-        if "过敏" not in blob:
+        if not past_history:
+            missing.append("既往史")
+        if not allergy_history:
             missing.append("过敏史")
+        if not medication_history:
+            missing.append("用药史")
+        if not family_history:
+            missing.append("家族史")
 
         return {
             "chief_complaint": chief,
             "present_illness": present,
             "symptoms": symptoms,
-            "past_history": "否认慢性病史。" if "否认" in blob else "",
-            "allergy_history": "" ,
-            "medication_history": "",
-            "family_history": "",
-            "surgical_history": "",
+            "past_history": past_history,
+            "allergy_history": allergy_history,
+            "medication_history": medication_history,
+            "family_history": family_history,
+            "surgical_history": surgical_history,
             "missing_info": missing,
             "needs_confirmation": [],
         }
+
+    @staticmethod
+    def _collect(lines: List[str], keywords: List[str]) -> str:
+        """Join (deduplicated) transcript lines that mention any keyword."""
+        hits: List[str] = []
+        for line in lines:
+            if any(kw in line for kw in keywords) and line not in hits:
+                hits.append(line)
+        return "；".join(hits)
