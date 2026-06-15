@@ -2,6 +2,7 @@
   <div class="control-bar medical-card">
     <div class="left-section">
       <el-button v-if="status === 'idle'" type="primary" @click="$emit('start')">开始诊断</el-button>
+      <el-button v-if="status === 'idle' || status === 'done'" plain @click="$emit('demo')">使用 Demo 数据</el-button>
       <el-button v-if="status === 'recording'" type="danger" @click="$emit('complete')">完成诊断</el-button>
       <el-button v-if="status === 'done'" type="primary" @click="$emit('start')">新诊断</el-button>
       <el-button v-if="status === 'done'" type="success" @click="$emit('save')">保存记录</el-button>
@@ -34,7 +35,7 @@ defineProps({
   statusLabel: { type: String, default: '' },
 })
 
-defineEmits(['start', 'complete', 'save', 'export-docx', 'open-settings'])
+defineEmits(['start', 'complete', 'save', 'export-docx', 'open-settings', 'demo'])
 </script>
 
 <style scoped>

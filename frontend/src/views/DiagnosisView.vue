@@ -28,6 +28,7 @@
       :sessionId="sessionId"
       :statusLabel="statusLabel"
       @start="handleStart"
+      @demo="handleDemo"
       @complete="handleComplete"
       @save="handleSave"
       @export-docx="handleExportDocx"
@@ -71,6 +72,28 @@ const suggestions = ref([])
 const showSettings = ref(false)
 
 const doctorUser = ref(getDoctorUser())
+
+// Scripted doctor/patient dialogue for the offline "Demo 数据" walkthrough.
+// It mirrors a real consultation (chief complaint + 既往史/用药史/过敏史/手术史/家族史)
+// so the full pipeline can be demonstrated without a microphone or ASR service.
+const DEMO_DIALOGUE = [
+  '您好，今天主要是哪里不舒服？',
+  '医生，我这两天胸口闷痛，有时候还喘不过气。',
+  '胸痛大概持续多久了？是什么样的疼痛？',
+  '差不多两天了，一阵一阵的压榨样疼痛，活动以后会加重。',
+  '您以前有没有高血压、糖尿病这类病史？',
+  '有的，我高血压十多年了，还有糖尿病好几年。',
+  '平时都在吃什么药？',
+  '我一直口服降压药氨氯地平，血糖靠打胰岛素控制。',
+  '有没有药物过敏史？',
+  '我对青霉素过敏。',
+  '以前做过什么手术吗？',
+  '几年前做过阑尾切除手术。',
+  '家里人有没有类似的病？',
+  '我父亲也有高血压，家族里还有心脏病史。',
+]
+
+const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms))
 
 const { isRecording, partialText, finalTexts, recordingStartTime, asrMode, asrError, startRecording, stopRecording } =
   useRecorder()
@@ -199,6 +222,46 @@ async function handleStart() {
     status.value = 'idle'
     stopEmrTimer()
     ElMessage.error('启动诊断失败：' + (err.message || '未知错误'))
+  }
+}
+
+async function handleDemo() {
+  if (status.value === 'recording' || status.value === 'generating') {
+    ElMessage.warning('请先结束当前问诊')
+    return
+  }
+  try {
+    const doctorId = doctorUser.value?.id || null
+    const res = await startDiagnosis(doctorId)
+    sessionId.value = res.data.session_id
+    localStorage.setItem('active_session_id', sessionId.value)
+    dialogues.value = []
+    structured.value = null
+    emrText.value = ''
+    riskAlerts.value = []
+    suggestions.value = []
+    lastSentIndex = 0
+    status.value = 'recording'
+    ElMessage.success('已载入 Demo 数据，正在模拟问诊...')
+
+    // Feed the scripted dialogue one line at a time so the transcript fills in
+    // progressively, mirroring the live ASR experience without a microphone.
+    const activeSession = sessionId.value
+    let clock = 0
+    for (const text of DEMO_DIALOGUE) {
+      if (sessionId.value !== activeSession) return
+      const segment = { text, start: clock, end: clock + 2 }
+      clock += 2
+      const tr = await transcribeDialogues(activeSession, [segment])
+      dialogues.value = tr.data.dialogues || dialogues.value
+      await sleep(650)
+    }
+
+    if (sessionId.value !== activeSession) return
+    await handleComplete()
+  } catch (err) {
+    status.value = 'idle'
+    ElMessage.error('Demo 运行失败：' + (err.message || '未知错误'))
   }
 }
 
